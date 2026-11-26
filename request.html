@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>資料請求｜動画編集パス</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: LPと同じ見た目（見本 版3）。紙の地に墨と青、Zen Kaku Gothic New、四角い青のボタン。入力欄は細い線、箱は並べない（本番も白基調の1テーマで固定） */
+:root{
+  color-scheme:light;
+  --paper:#fbfaf7; --white:#ffffff; --ink:#1b1b1b; --sub:#5b5f66; --line:#d9d6cf;
+  --blue:#1d4fc4; --blue-soft:#e9effb; --marker:#ffe680; --hold:#b85a0c; --hold-bg:#fff3e6;
+  --goth:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:#ecebe6;color:var(--ink);font-family:var(--goth);font-size:16px;line-height:1.9;-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--white)}
+h1,h2,h3,h4,p,figure{margin:0}
+h1,h2,h3,h4{text-wrap:balance;word-break:auto-phrase}
+p,li,dd{text-wrap:pretty}
+ul,ol{margin:0;padding:0;list-style:none}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+[hidden]{display:none!important}
+.nb{display:inline-block}
+.hold{display:inline-block;font:700 11px/1.5 var(--goth);color:var(--hold);background:var(--hold-bg);border:1px solid currentColor;padding:1px 7px;letter-spacing:.04em;max-width:100%}
+.src{font-size:12px;color:var(--sub);line-height:1.7}
+.mk{background:linear-gradient(transparent 62%,var(--marker) 62%)}
+
+/* 列 */
+.lp{max-width:750px;margin:0 auto;background:var(--paper) var(--grain);overflow:hidden;overflow:clip;box-shadow:0 0 40px rgba(0,0,0,.08)}
+.pad{padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.sec{padding-block:80px}
+.notice{background:var(--hold-bg);color:var(--hold);font-size:12.5px;font-weight:700;text-align:center;padding:8px 16px;line-height:1.7}
+
+/* ヘッダー */
+.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);box-shadow:0 1px 0 rgba(0,0,0,.06)}
+.hdr .pad{display:flex;align-items:center;justify-content:space-between;gap:12px;height:60px}
+.logo{display:flex;align-items:baseline;gap:10px;text-decoration:none;min-width:0}
+.logo .lg{font:700 17px/1 var(--goth);letter-spacing:.12em;white-space:nowrap}
+.logo .lg b{color:var(--blue);font-weight:700}
+.logo .by{font-size:12px;color:var(--sub);white-space:nowrap;letter-spacing:.04em}
+.hdr .mini{font:700 13px/1 var(--goth);color:#fff;background:var(--blue);text-decoration:none;padding:11px 14px;border-radius:2px;letter-spacing:.06em;white-space:nowrap}
+.hdr .mini:hover{background:#163f9e}
+
+/* 見出し */
+.ttl{text-align:center;font:700 clamp(18px,4.6vw,22px)/1.5 var(--goth);letter-spacing:.04em;margin-bottom:32px}
+.ttl .l{display:block;font-size:clamp(30px,8.4vw,46px);font-weight:900;line-height:1.35;margin-top:2px}
+
+/* ボタン：四角・青の単色・右に小さい白い▶ */
+.btn{position:relative;display:flex;align-items:center;justify-content:center;width:min(100%,520px);min-height:66px;padding:14px 40px;border-radius:2px;border:0;cursor:pointer;
+  background:var(--blue);color:#fff;text-decoration:none;font:700 clamp(17px,4.6vw,20px)/1.4 var(--goth);letter-spacing:.08em;text-align:center}
+.btn:hover{background:#163f9e}
+.btn::after{content:"";position:absolute;right:18px;top:50%;translate:0 -50%;border-left:7px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.btn:focus-visible,.hdr .mini:focus-visible,.day:focus-visible,.slot:focus-visible{outline:3px solid #8fb0ff;outline-offset:3px}
+.submit{width:100%;max-width:none}
+.submit:disabled{background:#b9b5ad;cursor:not-allowed}
+.submit:disabled::after{display:none}
+
+/* 資料請求・予約 */
+.book{min-height:100vh}
+.book-box{display:grid;gap:28px}
+.book-box > *{min-width:0}
+/* 流れ：上の細い線で今いる段を示す */
+.flowbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.flowbar li{border-top:3px solid var(--line);color:var(--sub);font-size:13px;font-weight:700;text-align:center;padding:10px 2px 0;line-height:1.45;display:grid;gap:2px;justify-items:center}
+.flowbar li b{font:900 18px/1.2 var(--goth);color:#b9b5ad}
+.flowbar li small{font-size:11px;font-weight:500}
+.flowbar li.on{border-top-color:var(--blue);color:var(--ink)}
+.flowbar li.on b{color:var(--blue)}
+#lead,#got{display:grid;gap:28px}
+#lead > *,#got > *{min-width:0}
+.doc-intro{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:center}
+.doc-cover{display:grid;gap:6px}
+.doc-cover img{width:100%;border:1px solid var(--line);border-radius:2px}
+.doc-cover figcaption{font-size:12.5px;color:var(--sub);text-align:center}
+.doc-intro ul{display:grid;gap:8px}
+.doc-intro li{position:relative;padding-left:26px;font-weight:700;font-size:15px;line-height:1.6}
+.doc-intro li::before{content:"";position:absolute;left:4px;top:.2em;width:8px;height:14px;border:solid var(--blue);border-width:0 3px 3px 0;transform:rotate(40deg)}
+/* フォーム：細い線の入力欄 */
+.form{display:grid;gap:18px}
+.form > *{min-width:0}
+.form label{display:grid;gap:6px;font-size:14px;font-weight:700}
+.lb{display:flex;align-items:center;gap:0;flex-wrap:wrap}
+.form label i{font-style:normal;font-size:11px;font-weight:700;color:var(--blue);border:1px solid var(--blue);border-radius:2px;padding:0 6px;margin-left:8px;line-height:1.6}
+.form input,.form textarea,.note-l textarea{font:inherit;font-size:16px;font-weight:400;padding:11px 12px;border:1px solid #bdb8ae;background:var(--white);color:var(--ink);width:100%;border-radius:2px}
+.form input:focus,.form textarea:focus,.note-l textarea:focus{outline:2px solid var(--blue);outline-offset:-1px;border-color:var(--blue)}
+.form textarea{min-height:96px;resize:vertical}
+.opt{font-weight:500;color:var(--sub);font-size:12.5px;margin-left:4px}
+.purpose{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;min-width:0}
+.purpose legend{font-size:14px;font-weight:700;margin-bottom:8px;padding:0}
+.purpose legend span{font-weight:500;color:var(--sub);font-size:12.5px}
+.form .purpose label{display:flex;align-items:center;gap:6px;border:1px solid #bdb8ae;border-radius:2px;background:var(--white);padding:8px 12px;font-size:14px;font-weight:700;cursor:pointer}
+.form .purpose input{width:auto;accent-color:var(--blue)}
+.form .consent{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;gap:8px;font-weight:500;font-size:13.5px}
+.form .consent input{width:auto;margin-top:6px;accent-color:var(--blue)}
+.agree{font-size:13px;color:var(--sub)}
+.agree a{color:var(--blue)}
+/* 送信後 */
+.got-head{display:grid;gap:14px;justify-items:center;text-align:center;padding-bottom:28px;border-bottom:1px solid var(--line)}
+.got-ok{font:900 clamp(20px,5.6vw,26px)/1.55 var(--goth)}
+.dl-lead{font-weight:700;font-size:15px}
+.dl-lead .nb:last-child{background:linear-gradient(transparent 62%,var(--marker) 62%)}
+.sent{display:grid;gap:10px}
+.sent h3{font:900 17px/1.5 var(--goth)}
+.sent dl{margin:0;display:grid;grid-template-columns:9.5em minmax(0,1fr);border-top:1px solid var(--ink)}
+.sent dt,.sent dd{padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.sent dt{color:var(--sub);font-size:13px;padding-top:12px}
+.sent dd{margin:0;font-weight:700;white-space:pre-wrap;overflow-wrap:anywhere}
+.next{display:grid;gap:16px;padding-top:6px}
+.next > *{min-width:0}
+.next h3{text-align:center;font:700 clamp(17px,4.6vw,21px)/1.5 var(--goth)}
+.next h3 .nb:nth-child(n+2){font-size:1.3em;font-weight:900}
+.next > p{font-size:14.5px;color:var(--sub)}
+#pick{display:grid;gap:14px}
+#pick > *{min-width:0}
+.step-h{font-size:15px;font-weight:700;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.step-h .num{font:900 20px/1 var(--goth);color:var(--blue)}
+.step-h small{font-weight:500;color:var(--sub);font-size:12.5px}
+.days{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.day{flex:0 0 64px;border:1px solid #bdb8ae;border-radius:2px;background:var(--white);padding:8px 0;text-align:center;cursor:pointer;font:inherit;color:var(--ink);display:grid;gap:0}
+.day small{font-size:11px;color:var(--sub)}
+.day b{font-size:20px;font-weight:900;line-height:1.2}
+.day[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.day[aria-pressed="true"] small{color:#d9d6cf}
+.slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.slot{border:1px solid var(--blue);border-radius:2px;background:var(--white);color:var(--blue);font:inherit;font-weight:700;font-size:16px;padding:10px 0;cursor:pointer}
+.slot:disabled{border-color:var(--line);color:#b9b5ad;background:transparent;cursor:not-allowed;text-decoration:line-through}
+.slot[aria-pressed="true"]{background:var(--blue);color:#fff}
+.picked{font-size:15px;font-weight:700;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--blue)}
+.picked:empty{display:none}
+.note-l{display:grid;gap:6px;font-size:14px;font-weight:700}
+.note-l textarea{min-height:84px;resize:vertical}
+.skip{text-align:center}
+.done{padding:18px 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--line);display:grid;gap:6px}
+.done b{font-size:17px;color:var(--blue)}
+.done span{font-size:14px;color:var(--sub)}
+
+/* フッター */
+.ftr{background:var(--white);color:var(--sub);font-size:13px;padding-block:36px;display:grid;gap:14px;border-top:1px solid var(--line)}
+.ftr b{color:var(--ink);letter-spacing:.14em}
+.ftr nav{display:flex;gap:18px;flex-wrap:wrap}
+.ftr a{text-decoration:none;color:var(--sub)}
+.ftr a:hover{color:var(--ink)}
+
+@media (max-width:560px){
+  body{font-size:15px}
+  .pad{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+  .sec{padding-block:64px}
+  .logo .by{display:none}
+  .doc-intro{grid-template-columns:minmax(0,1fr);gap:16px}
+  .doc-intro li{font-size:14px}
+  .flowbar li{font-size:12px}
+  .slots{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .sent dl{grid-template-columns:minmax(0,1fr)}
+  .sent dt{border-bottom:0;padding-bottom:0}
+}
+</style>
+</head>
+<body>
+<div class="lp">
+<div class="notice">制作中の見本です。「仮の声」の札が付いた声は、実際のお客様の声ではありません。写真はイメージです。資料請求と予約はデモのため、送信されません。</div>
+
+<header class="hdr">
+  <div class="pad">
+    <a class="logo" href="#top"><span class="lg">動画編集<b>パス</b></span><span class="by">by SAIBE DIGITAL</span></a>
+    <a class="mini" href="./" onclick="if(history.length>1){history.back();return false;}">ページに戻る</a>
+  </div>
+</header>
+
+<main>
+<!-- 資料請求・予約 -->
+<section class="sec book pad" id="book" style="padding-top:40px">
+  <h2 class="ttl">サービス資料を<span class="l"><span class="mk">無料</span>でお送りします</span></h2>
+  <div class="book-box">
+    <ol class="flowbar" aria-label="お申し込みの流れ">
+      <li class="on" id="fb1"><b>1</b>資料請求</li>
+      <li id="fb2"><b>2</b>資料を受け取る</li>
+      <li id="fb3"><b>3</b>無料相談の予約<small>（任意）</small></li>
+    </ol>
+
+    <div id="lead">
+      <div class="doc-intro">
+        <figure class="doc-cover"><img src="img/doc-cover.png" width="1600" height="900" alt="動画編集パス サービス資料の表紙。対談・一人語りの動画編集を、月10万円〜の定額で、編集をまるごと"><figcaption>サービス資料（全16ページ）</figcaption></figure>
+        <ul>
+          <li>サービスの中身と料金</li>
+          <li>対象の動画と、対象外のもの</li>
+          <li>ご利用の流れ・よくある質問</li>
+        </ul>
+      </div>
+      <form class="form" id="lead-form" novalidate>
+        <label for="l-company"><span class="lb">会社名<i>必須</i></span><input id="l-company" name="company" autocomplete="organization" required></label>
+        <label for="l-name"><span class="lb">お名前<i>必須</i></span><input id="l-name" name="name" autocomplete="name" required></label>
+        <label for="l-mail"><span class="lb">メールアドレス<i>必須</i></span><input id="l-mail" name="email" type="email" autocomplete="email" required></label>
+        <fieldset class="purpose"><legend>動画を使いたい目的<span>（任意・いくつでも）</span></legend>
+          <label><input type="checkbox" name="purpose" value="採用">採用</label>
+          <label><input type="checkbox" name="purpose" value="営業・集客">営業・集客</label>
+          <label><input type="checkbox" name="purpose" value="情報発信">情報発信</label>
+          <label><input type="checkbox" name="purpose" value="未定">まだ決まっていない</label>
+        </fieldset>
+        <label for="l-note"><span class="lb">ご質問・お問い合わせ内容<small class="opt">（任意）</small></span><textarea id="l-note" name="note" placeholder="例：採用ページに社員インタビューを載せたい。今の外注費は月20万円ほど。"></textarea></label>
+        <label class="consent"><input type="checkbox" id="l-consent" checked><span>動画編集パスのご案内メールを受け取る（いつでも配信を止められます）</span></label>
+        <p class="agree"><a href="https://saibedigital.co.jp/privacy/" target="_blank" rel="noopener">プライバシーポリシー</a>に同意のうえ、送信してください。</p>
+        <button class="btn submit" type="submit">資料を受け取る</button>
+      </form>
+    </div>
+
+    <div id="got" hidden>
+      <div class="got-head">
+        <p class="got-ok"><span class="nb"><span id="got-name"></span>様、</span><span class="nb">資料のご請求</span><span class="nb">ありがとうございます。</span></p>
+        <p class="dl-lead"><span class="nb">サービス資料の</span><span class="nb">ダウンロードURLはこちら</span></p>
+        <a class="btn" href="douga-pass-service.pdf" download="動画編集パス_サービス資料.pdf">資料をダウンロード（PDF）</a>
+        <p class="src">同じURLを、<b id="got-mail"></b> にもメールでお送りしました。</p>
+      </div>
+      <div class="sent">
+        <h3>お問い合わせ内容</h3>
+        <dl id="sent-dl"></dl>
+      </div>
+      <div class="next">
+        <h3><span class="nb">続けて、</span><span class="nb">60分の無料相談を</span><span class="nb">予約しませんか？</span></h3>
+        <p>今のお悩みを伺い、動画編集パスが貴社に合うか・合わないかを正直にお伝えします。合う場合は、最初の3ヶ月の進め方の案もお渡しします。オンライン（Google Meet）・無料です。</p>
+        <div id="pick">
+          <p class="step-h"><span class="num">1</span>日付を選ぶ<small>平日のみ・2週間先まで</small></p>
+          <div class="days" id="days" role="group" aria-label="日付"></div>
+          <p class="step-h"><span class="num">2</span>時間を選ぶ<small>開始時刻・60分</small></p>
+          <div class="slots" id="slots" role="group" aria-label="開始時刻"></div>
+          <p class="picked" id="picked"></p>
+          <label class="note-l" for="b-note">相談で話したいこと（任意）<textarea id="b-note" name="note" placeholder="例：採用ページに社員インタビューを載せたい。月に3〜4本を想定。"></textarea></label>
+          <button class="btn submit" id="submit" type="button" disabled>時間を選んでください</button>
+          <p class="src skip">今は資料だけで大丈夫です。相談したくなったら、資料に載っているリンクからも予約できます。</p>
+        </div>
+        <div class="done" id="done" hidden><b>無料相談の予約を受け付けました（デモ）</b><span id="done-text"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="ftr pad">
+  <div><b>SAIBE DIGITAL</b><br>株式会社SAIBE DIGITAL</div>
+  <nav><a href="https://saibedigital.co.jp/" target="_blank" rel="noopener">会社サイト</a><a href="https://saibedigital.co.jp/privacy/" target="_blank" rel="noopener">プライバシーポリシー</a><a href="https://saibedigital.co.jp/contact/" target="_blank" rel="noopener">お問い合わせ</a></nav>
+  <p>掲載している人物の写真はイメージです。</p>
+</footer>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var lead=$('lead'),got=$('got'),form=$('lead-form');
+  function setStep(n){[1,2,3].forEach(function(k){$('fb'+k).className=k<=n?'on':'';});}
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var ok=true;
+    ['l-company','l-name','l-mail'].forEach(function(id){var el=$(id);var bad=!el.value.trim()||(el.type==='email'&&!/^\S+@\S+\.\S+$/.test(el.value));el.style.borderColor=bad?'var(--hold)':'';if(bad)ok=false;});
+    if(!ok)return;
+    $('got-name').textContent=$('l-name').value.trim();
+    $('got-mail').textContent=$('l-mail').value.trim();
+    var ps=[].slice.call(document.querySelectorAll('input[name=purpose]:checked')).map(function(x){return x.value;});
+    var rows=[['会社名',$('l-company').value.trim()],['お名前',$('l-name').value.trim()],['メールアドレス',$('l-mail').value.trim()],['動画を使いたい目的',ps.length?ps.join('、'):'（未選択）'],['ご質問・お問い合わせ内容',$('l-note').value.trim()||'（なし）']];
+    var dl=$('sent-dl');dl.innerHTML='';
+    rows.forEach(function(r){var dt=document.createElement('dt');dt.textContent=r[0];var dd=document.createElement('dd');dd.textContent=r[1];dl.appendChild(dt);dl.appendChild(dd);});
+    lead.hidden=true;got.hidden=false;setStep(3);
+    window.scrollTo(0,0);
+  });
+
+  // 予約のデモ：翌日から14日先までの平日、10〜17時開始
+  var WD=['日','月','火','水','木','金','土'];
+  var daysEl=$('days'),slotsEl=$('slots'),picked=$('picked'),submit=$('submit');
+  var sel={d:0,h:null};
+  var today=new Date();today.setHours(0,0,0,0);
+  var days=[];
+  for(var k=1;k<=14;k++){var d=new Date(today);d.setDate(today.getDate()+k);if(d.getDay()!==0&&d.getDay()!==6)days.push(d);}
+  function busy(d,h){return (d.getDate()*7+d.getMonth()*13+h*5)%9<3;}
+  function label(d){return (d.getMonth()+1)+'月'+d.getDate()+'日（'+WD[d.getDay()]+'）';}
+  function renderDays(){
+    daysEl.innerHTML='';
+    days.forEach(function(d,i){
+      var b=document.createElement('button');b.type='button';b.className='day';
+      b.setAttribute('aria-pressed',sel.d===i?'true':'false');
+      b.innerHTML='<small>'+(d.getMonth()+1)+'月・'+WD[d.getDay()]+'</small><b>'+d.getDate()+'</b>';
+      b.onclick=function(){sel.d=i;sel.h=null;renderDays();renderSlots();update();};
+      daysEl.appendChild(b);
+    });
+  }
+  function renderSlots(){
+    slotsEl.innerHTML='';
+    var d=days[sel.d];
+    for(var h=10;h<=17;h++){
+      var b=document.createElement('button');b.type='button';b.className='slot';b.textContent=h+':00';
+      var off=busy(d,h);b.disabled=off;if(off)b.setAttribute('aria-label',h+':00 予約済み');
+      b.setAttribute('aria-pressed',sel.h===h?'true':'false');
+      (function(hh){b.onclick=function(){sel.h=hh;renderSlots();update();};})(h);
+      slotsEl.appendChild(b);
+    }
+  }
+  function update(){
+    if(sel.h!==null){picked.textContent=label(days[sel.d])+' '+sel.h+':00〜'+(sel.h+1)+':00（60分）';submit.disabled=false;submit.textContent='この日時で予約する';}
+    else{picked.textContent='';submit.disabled=true;submit.textContent='時間を選んでください';}
+  }
+  submit.addEventListener('click',function(){
+    if(sel.h===null)return;
+    $('done-text').textContent=label(days[sel.d])+' '+sel.h+':00〜。本番では、ご入力のメールアドレスに Google Meet のURL付きの招待メールが届き、Notionの商談DBと Slack #商談通知 に記録されます。';
+    $('pick').hidden=true;$('done').hidden=false;
+  });
+  renderDays();renderSlots();update();
+})();
+</script>
+</body>
+</html>

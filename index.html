@@ -1,0 +1,953 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>動画編集パス LP</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: 中央750pxの縦長1カラムLP。見本（版3）に合わせ、紙の地に墨と青。見出しもゴシックで、言葉ごとに大小をつける。写真は四角く切らず背景に溶かすか角丸。箱は並べない（本番も白基調の1テーマで固定） */
+:root{
+  color-scheme:light;
+  --paper:#fbfaf7; --white:#ffffff; --ink:#1b1b1b; --sub:#5b5f66; --line:#d9d6cf;
+  --blue:#1d4fc4; --blue-soft:#e9effb; --marker:#ffe680; --hold:#b85a0c; --hold-bg:#fff3e6;
+  --goth:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:#ecebe6;color:var(--ink);font-family:var(--goth);font-size:16px;line-height:1.9;-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1;
+  padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--white)}
+h1,h2,h3,h4,p,figure{margin:0}
+h1,h2,h3,h4{text-wrap:balance;word-break:auto-phrase}
+p,li,dd,td,th,small{text-wrap:pretty}
+ul,ol{margin:0;padding:0;list-style:none}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+em{font-style:normal}
+.nb{display:inline-block}
+.hold{display:inline-block;font:700 11px/1.5 var(--goth);color:var(--hold);background:var(--hold-bg);border:1px solid currentColor;padding:1px 7px;letter-spacing:.04em;max-width:100%}
+.src{font-size:12px;color:var(--sub);line-height:1.7}
+.mk{background:linear-gradient(transparent 62%,var(--marker) 62%)}
+
+/* 列 */
+.lp{max-width:750px;margin:0 auto;background:var(--paper) var(--grain);overflow:hidden;overflow:clip;box-shadow:0 0 40px rgba(0,0,0,.08)}
+.pad{padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.sec{padding-block:80px}
+.on-white{background:var(--white)}
+.notice{background:var(--hold-bg);color:var(--hold);font-size:12.5px;font-weight:700;text-align:center;padding:8px 16px;line-height:1.7}
+
+/* ヘッダー */
+.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);box-shadow:0 1px 0 rgba(0,0,0,.06)}
+.hdr .pad{display:flex;align-items:center;justify-content:space-between;gap:12px;height:60px}
+.logo{display:flex;align-items:baseline;gap:10px;text-decoration:none;min-width:0}
+.logo .lg{font:700 17px/1 var(--goth);letter-spacing:.12em;white-space:nowrap}
+.logo .lg b{color:var(--blue);font-weight:700}
+.logo .by{font-size:12px;color:var(--sub);white-space:nowrap;letter-spacing:.04em}
+.hdr .mini{font:700 13px/1 var(--goth);color:#fff;background:var(--blue);text-decoration:none;padding:11px 14px;border-radius:2px;letter-spacing:.06em;white-space:nowrap}
+.hdr .mini:hover{background:#163f9e}
+
+/* 見出し：小さい前置きの行＋大きい行 */
+.ttl{text-align:center;font:700 clamp(18px,4.6vw,22px)/1.5 var(--goth);letter-spacing:.04em;margin-bottom:36px}
+.ttl .l{display:block;font-size:clamp(30px,8.4vw,46px);font-weight:900;line-height:1.35;margin-top:2px}
+.ttl em{color:var(--blue)}
+.lead{text-align:center;color:var(--sub);font-size:15px;margin:-18px 0 36px}
+
+/* 傾けた青い札（見本の .slant を小さくしたもの） */
+.slant{display:inline-block;background:var(--blue);color:#fff;font:700 clamp(13px,3.5vw,16px)/1 var(--goth);letter-spacing:.08em;padding:9px 16px;transform:rotate(-2deg);box-shadow:3px 3px 0 rgba(0,0,0,.12)}
+.tag{display:inline-block;justify-self:start;width:max-content;background:var(--blue);color:#fff;font:700 12.5px/1 var(--goth);letter-spacing:.08em;padding:6px 10px;transform:rotate(-2deg);box-shadow:2px 2px 0 rgba(0,0,0,.12);white-space:nowrap}
+
+/* ボタン：四角・青の単色・右に小さい白い▶ */
+.cta{display:grid;justify-items:center;gap:10px;text-align:center;width:100%}
+.cta-bubble{font:700 14px/1.5 var(--goth);letter-spacing:.04em}
+.btn{position:relative;display:flex;align-items:center;justify-content:center;width:min(100%,520px);min-height:66px;padding:14px 40px;border-radius:2px;border:0;cursor:pointer;
+  background:var(--blue);color:#fff;text-decoration:none;font:700 clamp(17px,4.6vw,20px)/1.4 var(--goth);letter-spacing:.08em;text-align:center}
+.btn:hover{background:#163f9e}
+.btn::after{content:"";position:absolute;right:18px;top:50%;translate:0 -50%;border-left:7px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.btn:focus-visible,.hdr .mini:focus-visible{outline:3px solid #8fb0ff;outline-offset:3px}
+.cta-sub{font-size:13px;color:var(--sub)}
+
+/* 上の帯 */
+.strip{background:var(--ink);color:#fff;text-align:center;font:500 clamp(13px,3.4vw,17px)/1.6 var(--goth);letter-spacing:.14em;padding:12px 16px}
+
+/* ファーストビュー */
+.fv{position:relative;padding-bottom:56px;background:
+  radial-gradient(60% 40% at 0% 70%,rgba(29,79,196,.07),transparent 70%),
+  radial-gradient(50% 35% at 100% 95%,rgba(29,79,196,.06),transparent 70%)}
+.fv-photo{position:relative;height:clamp(250px,62vw,440px)}
+.fv-photo img{width:100%;height:100%;object-fit:cover;object-position:60% 40%;
+  -webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent 100%),linear-gradient(to right,transparent 0,#000 18%);
+  -webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,#000 55%,transparent 100%),linear-gradient(to right,transparent 0,#000 18%);mask-composite:intersect}
+.fv-copy{position:relative;margin-top:clamp(-120px,-18vw,-70px);display:grid;justify-items:center;text-align:center;gap:6px}
+.fv-copy > *{min-width:0;max-width:100%}
+.tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:18px}
+.tags span{font:700 13px/1.5 var(--goth);background:var(--white);border:1px solid var(--ink);border-radius:2px;padding:3px 10px}
+.logo-big{font:900 clamp(30px,8.2vw,50px)/1.2 var(--goth);letter-spacing:.1em;margin-top:14px}
+.logo-big b{color:var(--blue);font-weight:900}
+.catch{margin-top:14px;line-height:1.3;letter-spacing:.02em}
+.catch .m{display:block;font-size:clamp(22px,6vw,36px);font-weight:900}
+.catch .l{display:block;font-size:clamp(33px,9.2vw,58px);font-weight:900;margin-top:2px}
+.catch .s{display:block;font-size:clamp(18px,4.8vw,26px);font-weight:700;margin-top:6px}
+.swoosh{width:min(78%,420px);height:18px;margin:2px auto 0;color:var(--blue);opacity:.55}
+.fv-lead{margin-top:14px;font:700 clamp(15px,4.2vw,19px)/1.75 var(--goth);color:var(--sub)}
+.fv-lead .nb:first-of-type{color:var(--ink)}
+.price-line{margin-top:14px;display:grid;justify-items:center;gap:0;font-weight:700}
+.price-line .pr{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;column-gap:4px}
+.price-line .y{font-size:clamp(18px,4.6vw,24px)}
+.price-line strong{font-size:clamp(64px,18vw,104px);line-height:1;color:var(--blue);font-weight:900;letter-spacing:-.02em}
+.price-line .u{font-size:clamp(24px,6.4vw,36px)}
+.price-line small{font:500 13px var(--goth);color:var(--sub);margin-left:2px}
+.price-line .p2{font-size:clamp(18px,4.8vw,24px);margin-top:6px}
+.price-line .p3{font-size:clamp(28px,7.8vw,44px);font-weight:900;line-height:1.35}
+.fv-limit{font:500 14px/1.7 var(--goth);color:var(--sub);margin-top:4px}
+.badges{display:flex;justify-content:center;gap:clamp(8px,2.4vw,18px);margin-top:22px}
+.badge{width:clamp(96px,27vw,150px);aspect-ratio:1;border-radius:50%;background:var(--white);display:grid;place-content:center;text-align:center;
+  box-shadow:0 0 0 1px rgba(29,79,196,.28),0 0 0 6px var(--white),0 0 0 7px rgba(29,79,196,.18),0 8px 18px rgba(0,0,0,.06);line-height:1.25}
+.badge span{font:500 clamp(11px,3vw,14px)/1.4 var(--goth);color:var(--sub)}
+.badge b{font:900 clamp(22px,6.4vw,34px)/1.15 var(--goth);color:var(--blue)}
+.badge b small{font-size:.5em;color:var(--ink);margin-left:1px}
+.proof{margin-top:18px;font:500 14px var(--goth);color:var(--sub)}
+.proof b{font:900 26px/1 var(--goth);color:var(--ink);margin:0 2px}
+.fv .cta{margin-top:26px}
+/* 6マスの表：線の細い表 */
+.panel{margin:34px 0 0;width:100%;max-width:560px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+.panel div{padding:12px 4px;display:grid;gap:2px;align-content:center;text-align:center;min-width:0}
+.panel div:nth-child(-n+3){border-bottom:1px solid var(--line)}
+.panel div:not(:nth-child(3n)){border-right:1px solid var(--line)}
+.panel dt{font:500 12.5px/1.5 var(--goth);color:var(--sub)}
+.panel dd{margin:0;font:700 14px/1.4 var(--goth)}
+.panel dd b{font:900 clamp(22px,6vw,30px)/1.1 var(--goth);color:var(--blue);margin:0 1px}
+
+/* 吹き出し（手書き風・左右交互に傾ける） */
+.says{display:grid;gap:14px}
+.say{position:relative;max-width:84%;background:var(--white);border:1.5px solid var(--ink);border-radius:22px;padding:12px 18px;font:500 15.5px/1.6 var(--goth)}
+.say b{font-weight:900;color:var(--blue)}
+.say:nth-child(odd){justify-self:start;transform:rotate(-1.2deg)}
+.say:nth-child(even){justify-self:end;transform:rotate(1deg)}
+.say::after{content:"";position:absolute;bottom:-11px;width:16px;height:16px;background:var(--white);border:solid var(--ink);border-width:0 1.5px 1.5px 0}
+.say:nth-child(odd)::after{left:30px;transform:rotate(45deg) skew(10deg,10deg)}
+.say:nth-child(even)::after{right:30px;transform:rotate(45deg) skew(10deg,10deg)}
+
+/* 全幅の青い帯（下を三角に切る） */
+.band{position:relative;background:var(--blue);color:#fff;text-align:center;padding:40px 20px 52px;
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 22px),50% 100%,0 calc(100% - 22px))}
+.band .s{display:block;font:500 clamp(15px,4vw,18px)/1.6 var(--goth);opacity:.9}
+.band .l{display:block;font:900 clamp(28px,8vw,44px)/1.4 var(--goth);margin-top:4px}
+
+/* 共感：写真に吹き出しを重ねる */
+.prob{padding-top:72px;background:var(--white)}
+.prob .ttl{margin-bottom:0}
+.pain-photo{margin-top:22px;position:relative}
+.pain-photo img{width:100%;height:clamp(220px,58vw,400px);object-fit:cover;object-position:60% 30%;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 18%,#000 62%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 18%,#000 62%,transparent 100%)}
+.prob .says{position:relative;margin-top:clamp(-120px,-24vw,-80px);padding:0 20px 8px}
+.prob .band{margin-top:44px}
+.common .l{font-size:clamp(22px,6.2vw,36px);line-height:1.55;margin-top:6px}
+.common .mk{background:none;color:var(--marker)}
+.common .t{display:block;font-size:clamp(16px,4.4vw,22px);font-weight:700;margin-top:8px;line-height:1.7}
+
+/* 原因：淡い青の地 */
+.cause{background:var(--blue-soft)}
+.belief{text-align:center;font:700 clamp(18px,4.8vw,24px)/1.6 var(--goth);margin-bottom:28px}
+.belief em{font-weight:900;font-size:1.3em;color:var(--blue)}
+.lib{background:var(--white);color:var(--ink);padding:20px 20px 16px;display:grid;gap:14px;max-width:540px;margin:0 auto;border-radius:2px;transform:rotate(-.6deg)}
+.lib-h{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid var(--ink);padding-bottom:8px;gap:8px}
+.lib-h b{font-size:16px}
+.lib-h span{font-size:12px;color:var(--sub)}
+.lib-one{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:center}
+.lib-one svg{display:block;width:100%;height:auto;border-radius:2px}
+.lib-one b{display:block;font-size:14.5px;line-height:1.6}
+.lib-one span{font-size:12px;color:var(--sub)}
+.lib-empty{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.lib-empty i{aspect-ratio:16/9;border:1.5px dashed #c9c5bc;display:grid;place-items:center;font-style:normal;font-size:11px;color:#9a968e}
+.lib-list li{font-size:13.5px;font-weight:700;padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative;line-height:1.6}
+.lib-list li::before{content:"";position:absolute;left:2px;top:50%;width:8px;height:2px;background:var(--blue)}
+.right{margin-top:56px;text-align:center;font:900 clamp(30px,8.4vw,44px)/1.4 var(--goth)}
+.but{display:block;width:max-content;margin:22px auto 0;background:var(--ink);color:#fff;font:900 clamp(30px,8.4vw,44px)/1 var(--goth);padding:14px 24px;transform:rotate(-3deg);box-shadow:4px 4px 0 rgba(0,0,0,.12)}
+.ask{margin-top:30px;text-align:center;font:900 clamp(22px,6vw,30px)/1.55 var(--goth)}
+.bubbles{margin:30px auto 0;max-width:520px;padding:0 8px}
+.bubbles .say{font-weight:700;max-width:94%}
+.diff{text-align:center;color:var(--sub);margin-top:30px}
+.answer{margin-top:52px;text-align:center;display:grid;gap:10px}
+.answer > span{font:700 clamp(16px,4.4vw,20px)/1.5 var(--goth);color:var(--sub)}
+.answer p{font:900 clamp(24px,6.6vw,36px)/1.55 var(--goth)}
+.answer small{font-size:14px;color:var(--sub)}
+
+/* 時代 */
+.now-photo{margin:0 0 32px}
+.now-photo img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:12px}
+.now-lead{text-align:center;font:700 clamp(17px,4.4vw,20px)/1.85 var(--goth);margin-bottom:28px}
+.views{display:grid;border-top:1px solid var(--line)}
+.views li{display:grid;gap:8px;padding:20px 0;border-bottom:1px solid var(--line)}
+.view-say{font:900 clamp(17px,4.6vw,20px)/1.6 var(--goth)}
+.view-say span{display:block;font:500 14px/1.7 var(--goth);color:var(--sub)}
+.ai-line{text-align:center;color:var(--sub);margin:40px 0 20px;font-size:15px}
+.shift{display:grid;justify-items:center;text-align:center}
+.shift div{display:grid;gap:2px}
+.shift small{font-size:14px;font-weight:700}
+.shift .from{color:var(--sub)}
+.shift .from strong{font:700 clamp(18px,4.8vw,22px)/1.5 var(--goth)}
+.shift .ar{width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;border-top:16px solid var(--blue);margin:14px 0}
+.shift .to strong{font:900 clamp(23px,6.4vw,32px)/1.45 var(--goth);color:var(--blue)}
+.now-end{margin-top:40px;text-align:center;font:900 clamp(18px,4.8vw,22px)/1.8 var(--goth)}
+.now-end small{display:block;font-size:15px;font-weight:500;color:var(--sub);margin-top:8px}
+
+/* ケース */
+.case-list{display:grid}
+.case{display:grid;gap:16px;padding:40px 0;border-top:1px solid var(--line)}
+.case:first-child{border-top:0;padding-top:0}
+.case-top{display:grid;gap:12px;justify-items:start}
+.case-top h3{font:900 clamp(22px,6vw,30px)/1.45 var(--goth)}
+.case img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:12px}
+.case-body{display:grid;gap:12px}
+.case-kind{font-size:14px;color:var(--sub)}
+.case-kind b{color:var(--ink)}
+.case ul{display:grid;gap:10px}
+.case li{position:relative;padding-left:28px;font:700 15.5px/1.65 var(--goth)}
+.case li::before{content:"";position:absolute;left:4px;top:.3em;width:8px;height:14px;border:solid var(--blue);border-width:0 3px 3px 0;transform:rotate(40deg)}
+.case li.goal{font-size:clamp(17px,4.6vw,19px);font-weight:900;margin-top:6px}
+.cases-note{margin-top:8px;text-align:center}
+.cases .cta-wrap{margin-top:40px}
+
+/* 声：引用の組み */
+.voices .hold{display:table;margin:-14px auto 0}
+.vlist{display:grid;gap:52px;max-width:600px;margin:40px auto 0}
+.quote{position:relative;padding-top:34px}
+.quote::before{content:"“";position:absolute;left:-6px;top:-30px;font:900 120px/1 Georgia,serif;color:#dbe4f7}
+.quote h3{position:relative;font:900 clamp(23px,6.4vw,32px)/1.45 var(--goth)}
+.quote h3 em{color:var(--blue)}
+.quote p{margin-top:14px;font-size:15.5px}
+.quote .by{display:flex;align-items:center;gap:10px;margin-top:16px;font:700 14px/1.5 var(--goth);color:var(--sub)}
+.quote .by::before{content:"";flex:none;width:28px;height:2px;background:var(--ink)}
+.voices-note{text-align:center;margin-top:36px}
+
+/* サービス */
+.bridge{display:grid;gap:28px}
+.bridge .ttl{margin-bottom:0}
+.bridge .ttl em{color:var(--blue)}
+.bridge > p{text-align:center;color:var(--sub)}
+.est{background:var(--white);border:1px solid var(--line);padding:22px 20px 18px;max-width:540px;margin:0 auto;width:100%;transform:rotate(-1deg)}
+.est-h{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1.5px solid var(--ink);padding-bottom:8px;margin-bottom:6px;gap:8px;flex-wrap:wrap}
+.est-h b{font-size:19px;letter-spacing:.5em}
+.est-h span{font-size:11px;color:var(--sub)}
+.est table{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.6}
+.est th,.est td{padding:9px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.est th{font-size:11px;color:var(--sub);font-weight:500}
+.est td.r{text-align:right;white-space:nowrap;font-weight:700}
+.est td.r.t{font-size:12.5px}
+.est .note{font-size:11px;color:var(--sub);margin-top:10px}
+.reveal{margin-top:80px;background:var(--blue-soft);text-align:center;padding-block:56px;display:grid;gap:12px}
+.reveal p.pre{font:700 clamp(15px,4vw,18px)/1.8 var(--goth);color:var(--sub)}
+.reveal h2{font:900 clamp(44px,12.4vw,72px)/1.15 var(--goth);letter-spacing:.06em}
+.reveal h2 b{color:var(--blue);font-weight:900}
+.reveal p.what{font-size:15.5px;font-weight:500}
+.blk{margin-top:80px}
+.sub-ttl{text-align:center;font:900 clamp(21px,5.6vw,26px)/1.5 var(--goth);margin-bottom:6px}
+/* 特長 */
+.feat li{display:grid;gap:10px;padding:28px 0;border-top:1px solid var(--line)}
+.feat li:first-child{border-top:0;padding-top:0}
+.feat h4{font:900 clamp(21px,5.8vw,27px)/1.5 var(--goth)}
+.feat p{font-size:15px;color:var(--sub)}
+/* 料金：傾いた帯＋大きい価格＋丸4つ */
+.plan{margin-top:96px;text-align:center;display:grid;justify-items:center;gap:6px;position:relative;isolation:isolate}
+.plan::before{content:"";position:absolute;inset:-40px -24px;z-index:-1;background:radial-gradient(60% 45% at 50% 30%,rgba(29,79,196,.08),transparent 70%)}
+.plan > *{min-width:0;max-width:100%}
+.plan .slant{font-size:clamp(15px,4vw,18px)}
+.plan .big{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;column-gap:4px;font-weight:700;margin-top:12px}
+.plan .big span{font-size:clamp(18px,4.6vw,24px)}
+.plan .big strong{font-size:clamp(72px,20vw,116px);line-height:1;color:var(--blue);font-weight:900;letter-spacing:-.02em}
+.plan .big em{font-size:clamp(24px,6.4vw,36px)}
+.plan .big span:last-child{font:500 13px var(--goth);color:var(--sub)}
+.plan-basic{font-size:14px;color:var(--sub)}
+.badges.four{flex-wrap:wrap;max-width:680px;gap:16px clamp(16px,4.4vw,20px);margin-top:28px}
+.four .badge{width:clamp(130px,36vw,150px)}
+.four .badge b{font-size:clamp(21px,5.8vw,28px)}
+.four .badge b small{font-size:.55em}
+.plan-note{display:grid;font-size:13px;color:var(--sub);line-height:1.8;margin-top:16px}
+.plans{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:30px}
+.plans span{font:700 13px/1.5 var(--goth);border:1px solid var(--ink);border-radius:2px;padding:3px 10px;background:var(--white)}
+.plans span.on{background:var(--blue);border-color:var(--blue);color:#fff;transform:rotate(-2deg)}
+.plan-all{font-size:14px;color:var(--sub);max-width:540px;margin-top:6px}
+
+/* 対象：写真に名前を重ねる／対象外：灰色の✕ */
+.scope{margin-top:88px}
+.scope-h{text-align:center;font:900 clamp(19px,5.2vw,24px)/1.5 var(--goth);display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.scope-h i{font:700 13px/1 var(--goth);font-style:normal;padding:7px 10px;background:var(--blue);color:#fff;transform:rotate(-2deg);box-shadow:2px 2px 0 rgba(0,0,0,.12)}
+.kinds{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:24px}
+.kind{position:relative;min-width:0}
+.kind img{width:100%;aspect-ratio:4/3;object-fit:cover;
+  -webkit-mask-image:linear-gradient(to bottom,#000 48%,transparent 96%);mask-image:linear-gradient(to bottom,#000 48%,transparent 96%)}
+.kind figcaption{position:relative;margin-top:-62px;padding:0 8px;display:grid;gap:4px;text-align:center}
+.kind figcaption b{font:900 clamp(23px,6.2vw,30px)/1.3 var(--goth);text-shadow:0 0 10px var(--white),0 0 4px var(--white)}
+.kind figcaption small{font-size:13px;color:var(--sub);line-height:1.7}
+.out{margin-top:44px;display:grid;gap:14px;justify-items:center;text-align:center}
+.out h3{font:900 16px/1.5 var(--goth);display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;color:var(--sub)}
+.out h3 i{font-style:normal;font-size:12px;padding:1px 9px;background:#8b8780;color:#fff;border-radius:2px}
+.xlist{display:grid;gap:12px;justify-items:center}
+.xlist li{position:relative;padding-left:32px;font-weight:700;font-size:16px;line-height:1.6;color:#6d6a64;text-align:left}
+.xlist li::before,.xlist li::after{content:"";position:absolute;left:3px;top:.78em;width:19px;height:2.5px;background:#a7a39b;transform:rotate(45deg)}
+.xlist li::after{transform:rotate(-45deg)}
+.xlist small{display:block;font-weight:500;font-size:12.5px;color:#8b8780}
+.opt-note{font-size:13px;color:var(--blue);font-weight:700}
+
+/* オプション：紙の価格表 */
+.opts{margin-top:88px;padding:30px 4px 26px;border-top:3px double var(--ink);border-bottom:3px double var(--ink)}
+.opts .sub-ttl{letter-spacing:.24em}
+.opts > p{text-align:center;color:var(--sub);font-size:13px;margin-bottom:22px}
+.opt-list{display:grid;gap:22px;max-width:560px;margin:0 auto}
+.opt-list > div{display:grid;grid-template-columns:auto minmax(28px,1fr) auto;align-items:end;column-gap:8px;row-gap:2px;min-width:0}
+.opt-list > div::before{content:"";grid-column:2;grid-row:1;align-self:end;margin-bottom:.55em;border-bottom:2px dotted #a7a39b}
+.opt-list b{grid-column:1;grid-row:1;font-size:16px;line-height:1.55;min-width:0}
+.opt-list strong{grid-column:3;grid-row:1;font:900 17px/1.4 var(--goth);white-space:nowrap}
+.opt-list strong .num{font-size:1.45em;color:var(--blue);margin:0 1px}
+.opt-list > div > span{grid-column:1 / -1;font-size:12.5px;color:var(--sub);line-height:1.65}
+
+/* 比較表：動画編集パスの列を立てる */
+.cmp table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px;table-layout:fixed}
+.cmp th,.cmp td{border-bottom:1px solid #e6e3dc;padding:12px 6px;text-align:center;vertical-align:middle;line-height:1.5;color:#8b8780}
+.cmp thead th{font-size:12.5px;font-weight:700;padding:10px 4px;vertical-align:bottom;color:#8b8780;border-bottom:1px solid var(--line)}
+.cmp thead th.us{background:var(--blue);color:#fff;font-size:15px;font-weight:900;padding:24px 4px 12px;border-radius:12px 12px 0 0;border-bottom-color:var(--blue);line-height:1.35}
+.cmp tbody th{font-size:12.5px;width:4.6em;font-weight:700;text-align:left;color:var(--ink)}
+.cmp td.us{background:var(--blue-soft);color:var(--ink);font-weight:700;border-bottom-color:rgba(29,79,196,.16)}
+.cmp tbody tr:last-child th,.cmp tbody tr:last-child td{border-bottom:0}
+.cmp tbody tr:last-child td.us{border-radius:0 0 12px 12px}
+.cmp i{display:block;font-style:normal;font-size:17px;font-weight:700;line-height:1.3}
+.cmp td.us i{font-size:30px;font-weight:900;line-height:1.15;color:var(--blue)}
+.mk-o{color:#a7a39b} .mk-t{color:#b9b5ad} .mk-x{color:#c9c5bc}
+.cmp .src{margin-top:12px}
+
+/* ご利用ルール：要の言葉にマーカー */
+.rules ol{display:grid;gap:30px;max-width:600px;margin:0 auto}
+.rules li{display:grid;gap:6px}
+.rules b{font:900 clamp(19px,5.2vw,23px)/1.55 var(--goth)}
+.rules li > span{font-size:14.5px;color:var(--sub)}
+
+/* ご利用の流れ：下向きの矢羽根 */
+.steps ol{display:grid;max-width:600px;margin:0 auto}
+.steps li{display:grid;gap:10px;margin-bottom:26px}
+.arw{padding:16px 20px 36px;text-align:center;display:grid;gap:2px;clip-path:polygon(0 0,100% 0,100% calc(100% - 20px),50% 100%,0 calc(100% - 20px))}
+.arw b{font:700 13px/1.4 var(--goth);letter-spacing:.12em}
+.arw h4{font:900 clamp(20px,5.6vw,25px)/1.45 var(--goth)}
+.steps li:nth-child(1) .arw{background:#e6edfb;color:var(--ink)}
+.steps li:nth-child(2) .arw{background:#c6d5f4;color:var(--ink)}
+.steps li:nth-child(3) .arw{background:#93aee9;color:var(--ink)}
+.steps li:nth-child(4) .arw{background:var(--blue);color:#fff}
+.steps li:nth-child(5) .arw{background:var(--ink);color:#fff}
+.steps li:nth-child(-n+3) .arw b{color:var(--blue)}
+.steps li:nth-child(3) .arw b{color:#0f2d7a}
+.steps p{font-size:14px;color:var(--sub);text-align:center}
+.secure{margin-top:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;font-size:14px;text-align:center}
+.secure b{font-size:12px;letter-spacing:.06em;border:1px solid var(--ink);border-radius:2px;padding:2px 8px;background:var(--white)}
+
+/* 無料相談：写真から始めて、吹き出しの会話にする */
+.consult{margin-top:80px;padding-bottom:64px;display:grid;gap:22px;background:linear-gradient(to bottom,rgba(233,239,251,0) 0,var(--blue-soft) 240px)}
+.consult > *{min-width:0}
+.c-photo{margin-inline:calc(-1 * max(24px,env(safe-area-inset-left,0px)))}
+.c-photo img{width:100%;height:clamp(230px,58vw,400px);object-fit:cover;object-position:40% 35%;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 28%,#000 58%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 28%,#000 58%,transparent 100%)}
+.consult .ttl{position:relative;margin:clamp(-96px,-16vw,-56px) 0 0}
+.c-lead{text-align:center;font-size:15px}
+.c-flow{gap:26px;margin:8px 0 14px;padding:0 4px}
+.c-flow .say{max-width:90%;display:grid;gap:8px;padding:14px 18px 16px}
+.c-flow .say .tag{color:#fff}
+.c-flow .say > div{display:grid;gap:4px;min-width:0}
+.c-flow h4{font:900 17px/1.5 var(--goth)}
+.c-flow p{font-size:13.5px;color:var(--sub);line-height:1.75}
+.fit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;margin-top:6px}
+.fit > div{display:grid;gap:10px;align-content:start;min-width:0}
+.fit h4{font:900 16px/1.5 var(--goth);padding-bottom:8px;border-bottom:1px solid var(--ink);display:flex;align-items:flex-end}
+.fit .yes h4{color:var(--blue);border-color:var(--blue)}
+.fit .no h4{color:var(--sub);border-color:var(--sub)}
+.fit ul{display:grid;gap:10px}
+.fit li{position:relative;padding-left:22px;font-size:14px;font-weight:700;line-height:1.6}
+.fit .yes li::before{content:"";position:absolute;left:3px;top:.3em;width:7px;height:12px;border:solid var(--blue);border-width:0 2.5px 2.5px 0;transform:rotate(40deg)}
+.fit .no li::before{content:"";position:absolute;left:1px;top:.78em;width:12px;height:2px;background:#9a968e}
+.consult dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);font-size:15px;border-top:1px solid rgba(29,79,196,.25)}
+.consult dt,.consult dd{padding:10px 0;border-bottom:1px solid rgba(29,79,196,.25)}
+.consult dt{color:var(--sub);font-size:13.5px;padding-right:20px;padding-top:12px}
+.consult dd{margin:0;font-weight:700}
+.c-note{text-align:center}
+
+/* 変化：全幅の写真に札と見出しを重ねる */
+.changes{display:grid;gap:40px}
+.changes li{position:relative}
+.changes img{width:100%;aspect-ratio:4/3;object-fit:cover;
+  -webkit-mask-image:linear-gradient(to bottom,#000 42%,transparent 94%);mask-image:linear-gradient(to bottom,#000 42%,transparent 94%)}
+.changes li > div{position:relative;margin-top:clamp(-130px,-24vw,-84px);display:grid;gap:12px;justify-items:start}
+.changes li:nth-child(even) > div{justify-items:end;text-align:right}
+.changes li:nth-child(even) .tag{transform:rotate(2deg)}
+.changes p{font:900 clamp(21px,5.8vw,32px)/1.5 var(--goth);max-width:15em;text-shadow:0 0 14px var(--paper),0 0 6px var(--paper)}
+
+/* 青い帯のCTA */
+.cta-band{display:grid;gap:22px;justify-items:center;padding:52px 24px 68px}
+.cta-band p{font:900 clamp(22px,6vw,30px)/1.55 var(--goth)}
+.cta-band p small{display:block;font-size:14px;font-weight:500;opacity:.9;margin-top:6px}
+.cta-band .btn{background:var(--white);color:var(--blue)}
+.cta-band .btn::after{border-left-color:var(--blue)}
+.cta-band .btn:hover{background:#f1f4fb}
+
+/* 根拠 */
+.why{background:var(--white)}
+.why-a{text-align:center;font:700 clamp(17px,4.6vw,22px)/1.75 var(--goth);margin:-8px 0 20px}
+.why-a em{color:var(--blue);font-weight:900}
+.why-photo{margin-inline:calc(-1 * max(24px,env(safe-area-inset-left,0px)))}
+.why-photo img{width:100%;height:clamp(230px,60vw,420px);object-fit:cover;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 22%,#000 60%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 22%,#000 60%,transparent 100%)}
+/* 流れ：矢羽根（スマホは縦、広い画面は横） */
+.pipe{position:relative;margin:-30px auto 0;max-width:600px;display:grid;grid-template-columns:minmax(0,1fr) 74px;column-gap:10px}
+.pipe > div{grid-column:1;display:grid;justify-items:center;align-content:center;text-align:center;gap:0;padding:20px 16px 26px;margin-top:-9px;background:#e6e3dc;color:var(--ink);
+  clip-path:polygon(0 0,50% 14px,100% 0,100% calc(100% - 14px),50% 100%,0 calc(100% - 14px))}
+.pipe > div:first-child{margin-top:0;padding-top:12px;clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),50% 100%,0 calc(100% - 14px))}
+.pipe > div:nth-child(1){grid-row:1} .pipe > div:nth-child(2){grid-row:2} .pipe > div:nth-child(3){grid-row:3} .pipe > div:nth-child(4){grid-row:4} .pipe > div:nth-child(5){grid-row:5}
+.pipe > div.ai{background:var(--blue);color:#fff}
+.pipe > div.ed{background:var(--ink);color:#fff}
+.pipe .num{font:700 12px/1.6 var(--goth);letter-spacing:.1em;opacity:.75}
+.pipe b{font-size:15px;line-height:1.5}
+.pipe-tag{display:grid;place-items:center;text-align:center;font:900 14px/1.5 var(--goth);color:#fff;padding:6px 4px;writing-mode:vertical-rl;letter-spacing:.2em}
+.pipe-tag.k{grid-column:2;grid-row:2 / 4;background:var(--blue);margin:2px 0 16px}
+.pipe-tag.e{grid-column:2;grid-row:4;background:var(--ink);margin:2px 0 16px}
+/* 理由：左右に振って、言葉で見せる */
+.reasons{margin:56px auto 0;max-width:600px;display:grid;gap:40px}
+.reasons div{display:grid;gap:10px;justify-items:start}
+.reasons div:nth-child(2){margin-left:7%}
+.reasons div:nth-child(3){margin-left:14%}
+.reasons h3{font:900 clamp(21px,5.8vw,28px)/1.5 var(--goth)}
+.reasons p{font-size:15px;color:var(--sub)}
+/* 元が取れる：大きい数字と横棒 */
+.payoff{margin-top:80px}
+.payoff .ttl em{font-size:1.4em;font-weight:900}
+.vs{max-width:560px;margin:0 auto;display:grid;gap:22px}
+.vs-row{display:grid;gap:6px}
+.vs-row p{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px 10px;font:700 15px/1.4 var(--goth)}
+.vs-row p b{font:900 clamp(28px,8vw,44px)/1 var(--goth);letter-spacing:-.01em;white-space:nowrap}
+.vs-row p b small{font-size:.45em;margin:0 1px}
+.vs-row .bar{height:22px;background:#d9d6cf}
+.vs-row.us p b{color:var(--blue)}
+.vs-row.us .bar{background:var(--blue)}
+.payoff-note{max-width:560px;margin:24px auto 0;display:grid;gap:8px;font-size:15px}
+.payoff-note b{color:var(--blue)}
+.proof-line{font-weight:700}
+.proof-line b{color:var(--blue)}
+.why .cta-wrap{margin-top:48px}
+
+/* よくある質問：質問はお客様の吹き出し、答えは右に */
+.qa{display:grid;gap:28px;max-width:640px;margin:0 auto}
+.qa details{display:grid}
+.qa summary{list-style:none;cursor:pointer;position:relative;justify-self:start;width:fit-content;max-width:100%;text-wrap:pretty;background:var(--white);border:1.5px solid var(--ink);border-radius:22px;
+  padding:12px 42px 12px 42px;font:700 15.5px/1.6 var(--goth);transform:rotate(-1deg)}
+.qa details:nth-child(even) summary{transform:rotate(.8deg)}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary::before{content:"Q";position:absolute;left:17px;top:10px;font:900 19px/1.4 var(--goth);color:var(--blue)}
+.qa summary::after{content:"";position:absolute;bottom:-11px;left:30px;width:16px;height:16px;background:var(--white);border:solid var(--ink);border-width:0 1.5px 1.5px 0;transform:rotate(45deg) skew(10deg,10deg)}
+.qa .tg{position:absolute;right:16px;top:50%;translate:0 -50%;width:14px;height:14px}
+.qa .tg::before,.qa .tg::after{content:"";position:absolute;left:0;top:6px;width:14px;height:2px;background:var(--sub)}
+.qa .tg::after{transform:rotate(90deg);transition:transform .2s}
+.qa details[open] .tg::after{transform:rotate(0deg)}
+.qa summary:focus-visible{outline:3px solid #8fb0ff;outline-offset:3px}
+.qa details p{justify-self:end;max-width:86%;margin-top:20px;font-size:15px;line-height:1.85}
+.qa details p::before{content:"";display:inline-block;vertical-align:middle;width:26px;height:2px;background:var(--blue);margin:-3px 10px 0 0}
+.faq .cta-wrap{margin-top:48px}
+
+
+/* 最後に：写真を白へ溶かす */
+.last{position:relative;text-align:center;background:var(--white)}
+.last > img{width:100%;height:clamp(260px,64vw,460px);object-fit:cover;
+  -webkit-mask-image:linear-gradient(to bottom,#000 40%,transparent 100%);mask-image:linear-gradient(to bottom,#000 40%,transparent 100%)}
+.last .veil{position:relative;margin-top:clamp(-90px,-12vw,-48px);padding-block:0 88px;display:grid;gap:22px;justify-items:center}
+.last .ttl{margin-bottom:0;font-size:clamp(19px,5vw,24px)}
+.last .ttl .l{font-size:clamp(34px,9.4vw,52px)}
+.last p{font-size:16px;line-height:2}
+.last p.for{font:900 clamp(18px,4.8vw,22px)/1.8 var(--goth);color:var(--blue)}
+
+/* フッター */
+.ftr{background:var(--white);color:var(--sub);font-size:13px;padding-block:36px;display:grid;gap:14px;border-top:1px solid var(--line)}
+.ftr b{color:var(--ink);letter-spacing:.14em}
+.ftr nav{display:flex;gap:18px;flex-wrap:wrap}
+.ftr a{text-decoration:none;color:var(--sub)}
+.ftr a:hover{color:var(--ink)}
+
+/* 下に出し続けるボタン */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:55;pointer-events:none}
+.dock div{max-width:750px;margin:0 auto;background:rgba(251,250,247,.96);border-top:1px solid var(--line);pointer-events:auto;
+  padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.dock .btn{width:100%;max-width:none;min-height:56px;font-size:17px}
+
+@media (max-width:560px){
+  body{font-size:15px}
+  .pad{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+  .sec{padding-block:64px}
+  .logo .by{display:none}
+  .kinds{grid-template-columns:minmax(0,1fr);gap:30px}
+  .kind img{aspect-ratio:16/10}
+  .c-photo,.why-photo{margin-inline:calc(-1 * max(20px,env(safe-area-inset-left,0px)))}
+  .opt-list b{font-size:15px}
+  .fit{gap:14px}
+  .fit li{font-size:13.5px;padding-left:19px}
+  .fit .nb{display:inline}
+  .fit h4{min-height:calc(3em + 8px)}
+  .cmp table{font-size:12px}
+  .cmp th,.cmp td{padding:10px 3px}
+  .cmp thead th{font-size:11.5px}
+  .cmp thead th.us{font-size:13px;padding-top:20px}
+  .cmp tbody th{width:3.6em;font-size:11.5px}
+  .cmp td.us i{font-size:26px}
+  .lib-one{grid-template-columns:96px minmax(0,1fr)}
+  .qa summary{font-size:15px}
+}
+@media (min-width:561px){
+  /* 広い画面では、資料8ページと同じ横の矢羽根 */
+  .pipe{max-width:none;grid-template-columns:repeat(5,minmax(0,1fr));column-gap:0;row-gap:10px}
+  .pipe > div{grid-row:1!important;margin-top:0;margin-left:-6px;padding:16px 8px 16px 22px;min-height:96px;
+    clip-path:polygon(0 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,0 100%,16px 50%)}
+  .pipe > div:first-child{margin-left:0;padding-left:12px;padding-top:16px;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,0 100%)}
+  .pipe > div:nth-child(1){grid-column:1} .pipe > div:nth-child(2){grid-column:2} .pipe > div:nth-child(3){grid-column:3} .pipe > div:nth-child(4){grid-column:4} .pipe > div:nth-child(5){grid-column:5}
+  .pipe b{font-size:13.5px}
+  .pipe-tag{writing-mode:horizontal-tb;letter-spacing:.1em;margin:0!important}
+  .pipe-tag.k{grid-row:2;grid-column:2 / 4;margin-left:16px!important}
+  .pipe-tag.e{grid-row:2;grid-column:4;margin-left:16px!important;margin-right:16px!important}
+}
+</style>
+
+<div class="lp">
+<div class="notice">制作中の見本です。「仮の声」の札が付いた声は、実際のお客様の声ではありません。写真はイメージです。資料請求と予約はデモのため、送信されません。</div>
+
+<header class="hdr">
+  <div class="pad">
+    <a class="logo" href="#top"><span class="lg">動画編集<b>パス</b></span><span class="by">by SAIBE DIGITAL</span></a>
+    <a class="mini" href="request.html">資料請求</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- 01 ファーストビュー -->
+<p class="strip"><span class="nb">自社の「人」と「想い」を、</span><span class="nb">採用と集客の力にしたい企業の方へ</span></p>
+<section class="fv">
+  <figure class="fv-photo"><img src="img/hero.jpg" width="1536" height="1024" alt="会議室での対談を、手前のカメラで撮影している様子"></figure>
+  <div class="fv-copy pad">
+    <span class="slant">対談・一人語り動画の編集サブスク</span>
+    <div class="tags"><span>採用動画にも</span><span>お客様との対談にも</span><span>代表の一人語りにも</span></div>
+    <p class="logo-big">動画編集<b>パス</b></p>
+    <h1 class="catch"><span class="m">「動画を見て、</span><span class="l">ここに<span class="mk">決めました</span>」</span><span class="s">と言われる会社へ。</span></h1>
+    <svg class="swoosh" viewBox="0 0 420 18" fill="none" aria-hidden="true"><path d="M4 12c60-8 130-10 200-6s140 5 212-4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M60 15c50-4 110-5 170-2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".6"/></svg>
+    <p class="fv-lead">貴社の良さを、<br><span class="nb">“社内の人だけが知っている”</span><span class="nb">で終わらせない。</span></p>
+    <p class="price-line"><span class="pr"><span class="y">月額</span><strong>10</strong><span class="u">万円〜</span><small>（税別）</small></span><span class="p2">の定額で、編集を</span><span class="p3"><span class="mk">まるごとお任せ。</span></span></p>
+    <p class="fv-limit">品質を保つため、同時進行は2本まで</p>
+    <div class="badges">
+      <div class="badge"><span>安い</span><b>2.5<small>万円</small></b><span>1本あたり</span></div>
+      <div class="badge"><span>早い</span><b>5<small>営業日</small></b><span>初稿まで</span></div>
+      <div class="badge"><span>1本ごとの</span><b style="font-size:clamp(19px,5.4vw,30px)">稟議<br>なし</b></div>
+    </div>
+    <p class="proof">これまでの累計納品本数 <b>1,500</b>本</p>
+    <div class="cta">
+      <p class="cta-bubble">＼ 会社名・お名前・メールアドレスだけ ／</p>
+      <a class="btn" href="request.html">サービス資料を無料でもらう</a>
+      <p class="cta-sub">資料のあと、そのまま60分の無料相談も予約できます</p>
+    </div>
+    <dl class="panel">
+      <div><dt>月額（税別）</dt><dd><b>10</b>万円〜</dd></div>
+      <div><dt>本数の目安</dt><dd>月<b>3〜4</b>本</dd></div>
+      <div><dt>初稿まで</dt><dd><b>5</b>営業日</dd></div>
+      <div><dt>修正</dt><dd>1本<b>3</b>回まで</dd></div>
+      <div><dt>素材の長さ</dt><dd>1本<b>25</b>分まで</dd></div>
+      <div><dt>同時進行</dt><dd><b>2</b>本まで</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- 03 共感 -->
+<section class="prob">
+  <h2 class="ttl pad">こんな状態に、<span class="l"><span class="mk">心当たり</span>は<br>ありませんか</span></h2>
+  <figure class="pain-photo"><img src="img/pain.jpg" width="1536" height="1024" alt="夜の事務所で、外注費の見積もりを見ながら考え込む担当者"></figure>
+  <ul class="says">
+    <li class="say"><span class="nb">動画を作りたいが、</span><span class="nb">外注すると</span><b class="nb">高くて費用が出せない</b></li>
+    <li class="say"><span class="nb">今、外注費に</span><span class="nb"><b>月30万円以上</b>払っている。</span><span class="nb">固定費を下げたい</span></li>
+    <li class="say"><span class="nb">一度動画を作ったきり、</span><b class="nb">更新できていない</b></li>
+    <li class="say"><span class="nb">採用のときに、</span><b class="nb">会社の動画を見せられていない</b></li>
+  </ul>
+  <div class="band common">
+    <span class="s">共通しているのは</span>
+    <p class="l"><span class="nb">作りたい動画はあるのに、</span><br><span class="mk"><span class="nb">高い費用のせいで</span><span class="nb">作れていない。</span></span><span class="t"><span class="nb">だから、届けたい相手に</span><span class="nb">届いていない、</span><br>という状態です。</span></p>
+  </div>
+</section>
+
+<!-- 04 原因の言い換え -->
+<section class="sec cause pad">
+  <h2 class="ttl"><span class="nb">なぜ、</span><span class="l"><span class="nb">伝えたいことが</span><span class="nb">届かないのか</span></span></h2>
+  <p class="belief">動画で伝えるなら、<br>まずは<em>「ちゃんとした1本」</em>を。</p>
+  <div class="lib" aria-label="よくある会社の動画ページの例">
+    <div class="lib-h"><b>貴社の動画</b><span>公開中 1本</span></div>
+    <div class="lib-one">
+      <svg viewBox="0 0 160 90" aria-hidden="true"><rect width="160" height="90" fill="#2a2a2a"/><rect x="0" y="58" width="160" height="32" fill="#333"/><rect x="58" y="22" width="44" height="30" fill="#444"/><path d="M74 30l14 7-14 7z" fill="#e0ddd6"/></svg>
+      <div><b>会社紹介ムービー</b><span>プロに依頼して制作／公開：3年前</span></div>
+    </div>
+    <div class="lib-empty" aria-hidden="true"><i>まだない</i><i>まだない</i><i>まだない</i></div>
+    <ul class="lib-list">
+      <li>プロに頼んで、会社紹介の動画を1本</li>
+      <li>採用ページに、きれいな採用動画を1本</li>
+      <li>映像の質にこだわって、時間をかけて1本</li>
+    </ul>
+  </div>
+  <p class="right">どれも正しい。</p>
+  <p class="but">でも</p>
+  <p class="ask"><span class="nb">見る人が知りたいことに、</span><br><span class="nb">その1本は</span><span class="nb">答えられていますか？</span></p>
+  <ul class="bubbles says">
+    <li class="say"><span class="nb">「この会社で、</span><span class="nb">自分はどう働くのか」</span></li>
+    <li class="say"><span class="nb">「一緒に働くのは、</span><span class="nb">どんな人か」</span></li>
+    <li class="say"><span class="nb">「この会社に任せて、</span><span class="nb">本当に大丈夫か」</span></li>
+  </ul>
+  <p class="diff"><span class="nb">職種も、立場も、検討の段階も、</span><span class="nb">見る人によって違う。</span></p>
+  <div class="answer">
+    <span>本当に必要なのは</span>
+    <p><span class="nb">見る人ごとの</span><span class="nb">「知りたい」に</span><span class="nb">答える動画を、</span><br><span class="nb mk">出し続けること。</span></p>
+    <small><span class="nb">現場を知る社員の言葉、</span><span class="nb">代表の考え、お客様の実感。</span><span class="nb">どれも、その会社にしか撮れません。</span></small>
+  </div>
+</section>
+
+<!-- 05 時代 -->
+<section class="sec pad">
+  <h2 class="ttl"><span class="nb">応募や問い合わせの前に、</span><span class="l"><span class="nb">もう<span class="mk">比べられて</span></span><span class="nb">いる</span></span></h2>
+  <figure class="now-photo"><img src="img/viewer.jpg" width="1536" height="1024" alt="電車の中で、スマートフォンで会社の対談動画を見る手元"></figure>
+  <p class="now-lead"><span class="nb">求人も、商品も、</span><span class="nb">情報があふれる時代。</span><br><span class="nb">条件や価格は、</span><span class="nb">比べればすぐに並びます。</span></p>
+  <ul class="views">
+    <li><span class="tag">求職者</span><p class="view-say"><span>給与や休日は、求人サイトで比べられる。</span>決め手になるのは<span class="nb">「誰と働くか」</span></p></li>
+    <li><span class="tag">お客様</span><p class="view-say"><span>機能や価格は、比較サイトで並ぶ。</span>決め手になるのは<span class="nb">「この会社に任せられるか」</span></p></li>
+    <li><span class="tag">取引先</span><p class="view-say"><span>会社の概要は、検索すれば分かる。</span>決め手になるのは<span class="nb">「代表がどんな考えの人か」</span></p></li>
+  </ul>
+  <p class="ai-line">条件を並べるだけなら、比較サイトや検索でいくらでも並べられます。</p>
+  <div class="shift">
+    <div class="from"><small>条件だけを伝える会社</small><strong>比べられて、終わる</strong></div>
+    <div class="ar" aria-hidden="true"></div>
+    <div class="to"><small>人と想いが伝わる会社</small><strong><span class="nb">選ばれて、</span><span class="nb mk">会いに来てもらえる</span></strong></div>
+  </div>
+  <p class="now-end"><span class="nb">これからは、会社の</span><span class="nb">「人」と「想い」が</span><span class="nb mk">伝わることの価値が上がっていきます。</span><small>表情や話しぶりまで伝えられるのは、文字ではなく動画です。</small></p>
+</section>
+
+<!-- 06 ケース -->
+<section class="sec cases on-white pad">
+  <h2 class="ttl"><span class="nb">動画編集パスで、</span><span class="l"><span class="nb">貴社が</span><span class="nb mk">目指せる姿</span></span></h2>
+  <p class="lead">貴社の状況に近いケースをご覧ください。</p>
+  <div class="case-list">
+    <article class="case">
+      <div class="case-top"><b class="tag">ケース1</b><h3>外注費を下げたい企業</h3></div>
+      <img src="img/budget.jpg" width="1536" height="1024" alt="請求書と見積もりを見ながら、電卓で動画の費用を計算する担当者">
+      <div class="case-body">
+        <p class="case-kind">今の外注：<b>YouTube・採用ページの対談やインタビューの編集</b></p>
+        <ul>
+          <li>本数が増えるたびに増えていた外注費が、月額の定額に変わる</li>
+          <li>1本ごとの見積もりと発注のやり取りがなくなる</li>
+          <li>浮いた予算を、撮影や広告に回せる</li>
+          <li class="goal"><span class="mk">費用は下がって、出せる本数は増える</span></li>
+        </ul>
+      </div>
+    </article>
+    <article class="case">
+      <div class="case-top"><b class="tag">ケース2</b><h3>採用に活かしたい企業</h3></div>
+      <img src="img/recruit.jpg" width="1536" height="1024" alt="会議室で社員がインタビューに答え、カメラで撮影している様子">
+      <div class="case-body">
+        <p class="case-kind">撮る動画：<b>社員インタビュー・代表と社員の対談</b></p>
+        <ul>
+          <li>求人票では伝わらなかった「誰と働くか」を、応募の前に見せられる</li>
+          <li>面接で毎回くり返していた会社の説明を、動画に任せられる</li>
+          <li>仕事と人を分かったうえで、応募してもらえる</li>
+          <li class="goal"><span class="mk">「動画を見て、ここで働きたいと思いました」と言われる</span></li>
+        </ul>
+      </div>
+    </article>
+    <article class="case">
+      <div class="case-top"><b class="tag">ケース3</b><h3>営業・集客に活かしたい企業</h3></div>
+      <img src="img/talk.jpg" width="1536" height="1024" alt="会社の担当者とお客様が対談し、カメラで撮影している様子">
+      <div class="case-body">
+        <p class="case-kind">撮る動画：<b>お客様との対談・代表の一人語り</b></p>
+        <ul>
+          <li>営業が口で説明していた強みを、いつでも見られる形にできる</li>
+          <li>お客様の「頼んでよかった」を、お客様自身の言葉で残せる</li>
+          <li>初めての商談でも、代表の考えを知ったうえで話が始まる</li>
+          <li class="goal"><span class="mk">価格ではなく「この会社だから」で選ばれる</span></li>
+        </ul>
+      </div>
+    </article>
+    <article class="case">
+      <div class="case-top"><b class="tag">ケース4</b><h3><span class="nb">知識や考えを発信したい</span><span class="nb">代表・専門家</span></h3></div>
+      <img src="img/solo.jpg" width="1536" height="1024" alt="事務所の一角で、代表がカメラに向かって話している様子">
+      <div class="case-body">
+        <p class="case-kind">撮る動画：<b>一人語り（解説・講義）</b></p>
+        <ul>
+          <li>頭の中にあるノウハウを、話すだけで形にできる</li>
+          <li>よく聞かれる質問に、動画で先に答えておける</li>
+          <li>編集にかけていた時間を、本業に戻せる</li>
+          <li class="goal"><span class="mk">「いつも動画を見ています」と声をかけられる</span></li>
+        </ul>
+      </div>
+    </article>
+  </div>
+  <p class="src cases-note">目指す姿の例です。応募数や売上などの成果をお約束するものではありません。</p>
+  <div class="cta-wrap"><div class="cta">
+      <p class="cta-bubble">＼ 会社名・お名前・メールアドレスだけ ／</p>
+      <a class="btn" href="request.html">サービス資料を無料でもらう</a>
+      <p class="cta-sub">資料のあと、そのまま60分の無料相談も予約できます</p>
+    </div></div>
+</section>
+
+<!-- 07 声 -->
+<section class="sec voices pad">
+  <h2 class="ttl">お客様の<span class="l">声</span></h2>
+  <span class="hold">仮の声です。公開前に、実際にいただいた声へ差し替えます</span>
+  <div class="vlist">
+    <article class="quote"><h3><span class="nb">外注費が、</span><em class="nb">月20万円から</em><span class="nb"><em>10万円</em>になりました</span></h3><p>社長の対談動画を1本5万円で外注していて、月4本で20万円ほどかかっていました。今は同じ本数を月10万円で頼めています。浮いた分で、撮影の回数を増やせました。</p><p class="by">製造業・広報担当（従業員80名）</p></article>
+    <article class="quote"><h3><span class="nb">撮りためた</span><span class="nb">社員インタビューが、</span><em class="nb">やっと使えた</em></h3><p>撮影はしていたのに、編集が追いつかずに眠っていました。毎月4本ずつ仕上がるので、求人ページと説明会の案内に載せています。面接で「動画を見ました」と言われることが増えました。</p><p class="by">介護事業・採用担当（従業員120名）</p></article>
+    <article class="quote"><h3><span class="nb">一人語りの動画を、</span><em class="nb">毎週出せるようになった</em></h3><p>話したいことはあっても、編集する時間がありませんでした。三脚に立てたスマホで撮った素材を送るだけで、5営業日で初稿が届きます。毎週1本、YouTubeに出せています。</p><p class="by">税理士事務所・代表</p></article>
+  </div>
+  <p class="src voices-note">個人の感想です。成果をお約束するものではありません。</p>
+</section>
+
+<!-- 08 サービス -->
+<section class="sec on-white" id="service" style="padding-bottom:0">
+  <div class="pad">
+    <div class="bridge">
+      <h3 class="ttl"><span class="nb">「出し続ける」を</span><span class="nb">止めていたのは、</span><span class="l"><em class="mk">1本いくら</em>の料金。</span></h3>
+      <p>10分程度の動画で、編集だけで1本5万〜10万円。本数を増やすほど費用も増えるので、1本作ったところで止まってしまいます。</p>
+      <div class="est" aria-label="よくある見積もりの例">
+        <div class="est-h"><b>御見積書</b><span>よくある見積もりの例</span></div>
+        <table>
+          <tr><th>品目</th><th style="text-align:right">金額</th></tr>
+          <tr><td>動画編集（10分程度）× 1本</td><td class="r">¥50,000〜100,000</td></tr>
+          <tr><td>修正（決まった回数を超えた分）</td><td class="r t">都度、追加料金</td></tr>
+          <tr><td>テロップ・BGM</td><td class="r t">量により変動</td></tr>
+        </table>
+        <p class="note">金額は相場（見積もり比較サイトの取引データ・編集のみ・2026年）</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal pad">
+    <p class="pre"><span class="nb">見る人ごとの「知りたい」に答える動画を、</span><span class="nb">出し続ける。</span><br>そのための仕組みが</p>
+    <h2>動画編集<b>パス</b></h2>
+    <p class="what"><span class="nb">固定カメラで撮影した対談・一人語り動画を、</span><br><span class="nb">月額10万円〜の定額で</span><span class="nb">編集するサービスです。</span></p>
+  </div>
+
+  <div class="pad">
+    <div class="feat blk">
+      <h3 class="ttl">動画編集パスの<span class="l">3つの特長</span></h3>
+      <ol>
+        <li><b class="tag">特長1</b><h4><span class="mk">月額の定額</span>で、予算が決まる</h4><p>1本ごとの追加費用はかかりません。1本ごとの見積もりや稟議もいりません。</p></li>
+        <li><b class="tag">特長2</b><h4><span class="nb">月3〜4本を目安に、</span><span class="nb mk">出し続けられる</span></h4><p>職種ごと、お客様ごと、よくある質問ごと。見る人に合わせた動画を、毎月仕上げます。</p></li>
+        <li><b class="tag">特長3</b><h4><span class="nb mk">5営業日で初稿。</span><span class="nb">素材が長くても同じ</span></h4><p>素材を送るだけで、カット・テロップ・BGMまで弊社で。撮り方と編集の型が決まっているので、素材を受け取ってから5営業日で、初稿をお届けします。60分の素材でも、初稿までの日数は変わりません。</p></li>
+      </ol>
+    </div>
+
+    <div class="plan">
+      <b class="slant">動画編集パス</b>
+      <div class="big"><span>月額</span><strong>10</strong><em>万円〜</em><span>（税別）</span></div>
+      <p class="plan-basic"><span class="nb">ベーシックプランの料金です。</span><span class="nb">3ヶ月ごとの更新で、</span><span class="nb">3ヶ月分（30万円）を前払い。</span></p>
+      <div class="badges four">
+        <div class="badge"><span>本数</span><b>月3〜4本</b><span>が目安</span></div>
+        <div class="badge"><span>素材</span><b>1本25分</b><span>まで</span></div>
+        <div class="badge"><span>初稿</span><b>5<small>営業日</small></b><span>素材受領から</span></div>
+        <div class="badge"><span>修正</span><b>1本3回</b><span>まで月額内</span></div>
+      </div>
+      <p class="plan-note"><span>同時進行は2本まで</span><span>60分までは追加料金で対応。納期は同じ</span></p>
+      <div class="plans" aria-hidden="true"><span>お試し（1本から）</span><span class="on">ベーシック</span><span>スタンダード</span><span>プレミアム</span></div>
+      <p class="plan-all">本数に合わせて、お試し（1本から）・ベーシック・スタンダード・プレミアムの4つのプランがあります。各プランの料金は、サービス資料に載せています。</p>
+    </div>
+
+    <div class="scope">
+      <h3 class="scope-h"><i>対象</i>固定カメラで撮影した動画</h3>
+      <div class="kinds">
+        <figure class="kind"><img src="img/recruit.jpg" width="1536" height="1024" alt="固定カメラで撮影している対談の様子"><figcaption><b>対談動画</b><small>2人以上の会話。固定カメラ複数台の切り替えにも対応</small></figcaption></figure>
+        <figure class="kind"><img src="img/solo.jpg" width="1536" height="1024" alt="固定カメラに向かって一人で話している様子"><figcaption><b>一人語り動画</b><small>解説・講義・サービス紹介など</small></figcaption></figure>
+      </div>
+      <div class="out">
+        <h3><i>対象外</i>このプランに含まないもの</h3>
+        <ul class="xlist">
+          <li>カメラを動かしながら撮影した映像<small>ロケ・手持ち撮影など</small></li>
+          <li>サムネイル制作</li>
+        </ul>
+        <p class="opt-note">Instagram向けのショート動画は、別のご依頼で承ります。</p>
+      </div>
+    </div>
+
+    <div class="opts">
+      <h3 class="sub-ttl">必要な分だけ追加</h3>
+      <p>料金はすべて税別です。</p>
+      <div class="opt-list">
+        <div><b>アカウント運用</b><strong>月<span class="num">5</span>万円</strong><span>投稿代行・コメント対応・月1回のレポート</span></div>
+        <div><b>企画・台本</b><strong>1本<span class="num">2</span>万円</strong><span>動画の企画・台本作成</span></div>
+        <div><b>撮影</b><strong>1日<span class="num">5</span>万円</strong><span>交通費別</span></div>
+        <div class="new"><b>ショート動画（別のご依頼）</b><strong>1本<span class="num">7,000</span>円</strong><span>Instagramのリールなどで使う縦型動画（1本2分以内）を、長尺とは別に作ります。ショートだけのご依頼もできます</span></div>
+      </div>
+    </div>
+
+    <div class="cmp blk">
+      <h3 class="ttl">ほかの方法との<span class="l">比較</span></h3>
+      <table>
+        <thead><tr><th></th><th>1本ずつ外注</th><th>社内で編集</th><th class="us">動画編集パス</th></tr></thead>
+        <tbody>
+          <tr><th>費用</th><td><i class="mk-t">△</i>1本5万〜10万円</td><td><i class="mk-t">△</i>担当者の人件費と編集ソフト</td><td class="us"><i class="mk-o">◎</i>月10万円で固定</td></tr>
+          <tr><th>本数</th><td><i class="mk-x">×</i>増やすほど費用も増える</td><td><i class="mk-t">△</i>担当者の手が空く分だけ</td><td class="us"><i class="mk-o">◎</i>定額で月3〜4本が目安</td></tr>
+          <tr><th>修正</th><td><i class="mk-t">△</i>決まった回数を超えると追加料金</td><td><i class="mk-o">○</i>社内で対応</td><td class="us"><i class="mk-o">○</i>1本3回まで月額内</td></tr>
+          <tr><th>納期</th><td><i class="mk-t">△</i>見積もりとやり取り次第</td><td><i class="mk-t">△</i>兼務の空き次第</td><td class="us"><i class="mk-o">◎</i>素材受領から5営業日で初稿</td></tr>
+          <tr><th>社内の手間</th><td><i class="mk-t">△</i>毎回の見積もり・発注</td><td><i class="mk-x">×</i>編集作業そのもの</td><td class="us"><i class="mk-o">◎</i>素材を送るだけ</td></tr>
+        </tbody>
+      </table>
+      <p class="src">外注の金額は、10分程度の動画の編集のみの相場（見積もり比較サイトの取引データ・2026年）。</p>
+    </div>
+
+    <div class="rules blk">
+      <h3 class="ttl">ご利用<span class="l">ルール</span></h3>
+      <ol>
+        <li><b>同時に進める編集は<span class="mk">2本まで</span></b><span>1本ずつ、編集者が仕上げと確認まで見るためです。1本納品したら、次の1本に取りかかります。</span></li>
+        <li><b>素材は<span class="mk">1本25分まで</span></b><span>60分までは追加料金で承ります。初稿までの日数は、長さに関わらず5営業日です。</span></li>
+        <li><b>修正は<span class="mk">1本3回まで</span></b><span>3回までは月額の中で対応します。</span></li>
+        <li><b><span class="mk">固定カメラの対談・一人語り</span>が対象</b><span>カメラを動かしながら撮った映像とサムネイルは対象外です。Instagram向けのショート動画は、別のご依頼です。</span></li>
+        <li><b><span class="mk">3ヶ月ごとの更新・前払い</span></b><span>3ヶ月分（基本プランは30万円・税別）を前払いでお願いしています。途中で解約された場合も、お支払いいただいた料金は払い戻しできません。</span></li>
+      </ol>
+    </div>
+
+    <div class="steps blk">
+      <h3 class="ttl">ご利用の<span class="l">流れ</span></h3>
+      <ol>
+        <li><div class="arw"><b>STEP 1</b><h4>60分の無料相談</h4></div><p>今のお悩みを伺い、動画編集パスが合うかどうかを一緒に確かめます。</p></li>
+        <li><div class="arw"><b>STEP 2</b><h4>お申し込み</h4></div><p>3ヶ月分を前払いで。</p></li>
+        <li><div class="arw"><b>STEP 3</b><h4>素材を送る</h4></div><p>撮影したデータを、ギガファイル便かGoogle Driveでそのままお送りください。</p></li>
+        <li><div class="arw"><b>STEP 4</b><h4>5営業日で初稿</h4></div><p>カット・テロップ・BGMを入れて、初稿をお届けします。</p></li>
+        <li><div class="arw"><b>STEP 5</b><h4>確認・修正・納品</h4></div><p>1本3回まで修正できます。修正が終われば納品です。</p></li>
+      </ol>
+      <p class="secure"><b>情報セキュリティ</b><span>お預かりする素材は、IPA「SECURITY ACTION」二つ星の自己宣言に沿って管理しています。</span></p>
+    </div>
+  </div>
+
+  <div class="consult pad">
+    <figure class="c-photo"><img src="img/online.jpg" width="1536" height="1024" alt="ノートパソコンでオンラインの打ち合わせをしながら、メモを取る手元"></figure>
+    <h3 class="ttl"><span class="nb">無料相談では、</span><span class="l"><span class="nb">合うかどうかを</span><span class="nb"><span class="mk">正直に</span>お伝えします</span></span></h3>
+    <p class="c-lead">貴社のお悩みを伺ったうえで、動画編集パスが合うか・合わないかを一緒に確かめます。合わない場合は、そうお伝えします。</p>
+    <ol class="c-flow says">
+      <li class="say"><b class="tag">その1</b><div><h4>今のお悩みを伺う</h4><p>「外注費が高い」「作りたい動画があるのに作れていない」「作った動画が、見てほしい相手に届いていない」など、今の状況をそのままお聞かせください。</p></div></li>
+      <li class="say"><b class="tag">その2</b><div><h4>合うか・合わないかを確かめる</h4><p>撮り方、作りたい本数、動画の使い道を伺い、月額で頼むほうがよいか、1本ずつ外注するほうがよいかを、金額で比べてお見せします。</p></div></li>
+      <li class="say"><b class="tag">その3</b><div><h4><span class="nb">合う場合は、</span><span class="nb">最初の3ヶ月の使い方を</span></h4><p>何の動画を、月に何本、どこで使うか。最初の3ヶ月の進め方の案をお渡しします。</p></div></li>
+    </ol>
+    <div class="fit">
+      <div class="yes"><h4>合いやすい会社</h4><ul><li>月に2本以上、動画を作りたい</li><li><span class="nb">固定カメラで、</span><span class="nb">対談や一人語りを撮れる</span></li><li>今、外注に1本数万円以上払っている</li></ul></div>
+      <div class="no"><h4>合わないかもしれない会社</h4><ul><li>作りたい動画が、月1本ほど</li><li><span class="nb">カメラを動かして撮る映像や、</span><span class="nb">凝った演出が中心</span></li><li><span class="nb">サムネイルや</span><span class="nb">アニメーションの制作が中心</span></li></ul></div>
+    </div>
+    <dl>
+      <dt>所要時間</dt><dd>60分</dd>
+      <dt>形式</dt><dd>オンライン（Google Meet）</dd>
+      <dt>費用</dt><dd>無料</dd>
+    </dl>
+    <p class="src c-note">お申し込みは、相談のあとに持ち帰って決めていただいて大丈夫です。</p>
+    <div class="cta">
+      <a class="btn" href="request.html">サービス資料を無料でもらう</a>
+    </div>
+  </div>
+</section>
+
+<!-- 09 変化 -->
+<section class="sec changes-sec">
+  <h2 class="ttl pad">使い始めると、<span class="l">こう<span class="mk">変わる</span></span></h2>
+  <ul class="changes">
+    <li><img src="img/plan.jpg" width="1254" height="1254" alt="打ち合わせの机で、動画の企画をノートに書き出している手元"><div class="pad"><b class="tag">変化1</b><p>「これも動画にしよう」と、費用を気にせず決められる</p></div></li>
+    <li><img src="img/cal.jpg" width="1254" height="1254" alt="事務所の壁の予定表に、撮影の予定を貼っている様子"><div class="pad"><b class="tag">変化2</b><p>動画が続かなかったのは、熱意ではなく料金の仕組みのせいだったと分かる</p></div></li>
+    <li><img src="img/site.jpg" width="1254" height="1254" alt="町工場で、機械を説明する社員を撮影している様子"><div class="pad"><b class="tag">変化3</b><p>伝えたいことが、見る人ごとの動画として形になっていく</p></div></li>
+    <li><img src="img/tablet.jpg" width="1254" height="1254" alt="タブレットで動画を見せながら、お客様と話している手元"><div class="pad"><b class="tag">変化4</b><p>採用、営業、お客様への発信に、動画をどう使うかが見えてくる</p></div></li>
+  </ul>
+</section>
+
+<div class="band cta-band">
+  <p>まずは資料で、<br>料金と流れを確かめる。<small><span class="nb">資料のあと、そのまま60分の</span><span class="nb">無料相談も予約できます。</span></small></p>
+  <a class="btn" href="request.html">サービス資料を無料でもらう</a>
+</div>
+
+<!-- 10 根拠 -->
+<section class="sec why pad">
+  <h2 class="ttl"><span class="nb">安くて、速い。</span><span class="l"><span class="nb">それで、品質は</span><span class="nb">保てるのか。</span></span></h2>
+  <p class="why-a"><span class="nb">安く速くするために</span><span class="nb">手を抜くのではなく、</span><br><em class="mk"><span class="nb">編集の型が</span></em><span class="nb"><em class="mk">決まっている</em>から。</span></p>
+  <figure class="why-photo"><img src="img/editor.jpg" width="1536" height="1024" alt="夜、モニターで動画を編集している編集者の後ろ姿"></figure>
+  <div class="pipe">
+    <div><span class="num">STEP 1</span><b>素材の受け取り</b></div>
+    <div class="ai"><span class="num">STEP 2</span><b>型に沿ってカット（言い直し・間・脱線を削る）</b></div>
+    <div class="ai"><span class="num">STEP 3</span><b>型に沿ってテロップ・画角の切り替え・BGM</b></div>
+    <div class="ed"><span class="num">STEP 4</span><b>編集者が仕上げと確認</b></div>
+    <div><span class="num">STEP 5</span><b>納品</b></div>
+    <p class="pipe-tag k">編集の型</p>
+    <p class="pipe-tag e">編集者</p>
+  </div>
+  <div class="reasons">
+    <div><b class="tag">理由1</b><h3>対談と一人語りに<span class="mk">絞っている</span></h3><p>固定カメラで撮る形が決まっているので、毎回同じ型で編集できます。</p></div>
+    <div><b class="tag">理由2</b><h3>5年かけて作った<span class="mk">編集の型</span></h3><p>どこを切り、どこに文字を入れ、いつ画角を切り替えると見やすいかを、型にしています。</p></div>
+    <div><b class="tag">理由3</b><h3><span class="nb">1本ごとに、</span><span class="nb mk">一から考えない</span></h3><p>型があるので迷う時間がかかりません。だから5営業日で初稿を出せ、そのぶんの時間を仕上げと確認に使えます。</p></div>
+  </div>
+  <div class="payoff">
+    <h3 class="ttl"><span class="nb">月<em class="num">2</em>本の依頼で、</span><span class="l"><span class="nb mk">元が取れる</span><span class="nb">料金設定</span></span></h3>
+    <div class="vs" role="img" aria-label="10分程度の動画を2本外注した場合の相場は10万〜20万円、動画編集パスは月10万円からの定額">
+      <div class="vs-row"><p><span>外注で2本（相場）</span><b>10<small>万〜</small>20<small>万円</small></b></p><div class="bar" style="width:100%"></div></div>
+      <div class="vs-row us"><p><span>動画編集パス</span><b><small>月</small>10<small>万円〜の定額</small></b></p><div class="bar" style="width:50%"></div></div>
+    </div>
+    <div class="payoff-note">
+      <p>10分程度の動画の編集外注は、1本5万〜10万円が相場。<b class="mk">2本で月額10万円に到達</b>し、3本目からは依頼が増えるほど1本あたりの費用が下がります。</p>
+      <p>基本プランは<b>月3〜4本</b>が目安です。</p>
+      <p class="src">前提：当社試算。10分程度の動画の場合。相場は見積もり比較サイトの取引データ（編集のみ・2026年）。撮影・企画の費用は含みません。</p>
+      <p class="proof-line">これまでの累計納品本数：<b>1,500本</b><span class="nb">（2026年11月時点）</span></p>
+    </div>
+  </div>
+  <div class="cta-wrap"><div class="cta">
+      <p class="cta-bubble">＼ 会社名・お名前・メールアドレスだけ ／</p>
+      <a class="btn" href="request.html">サービス資料を無料でもらう</a>
+      <p class="cta-sub">資料のあと、そのまま60分の無料相談も予約できます</p>
+    </div></div>
+</section>
+
+<!-- よくある質問 -->
+<section class="sec faq pad">
+  <h2 class="ttl">よくある<span class="l">質問</span></h2>
+  <div class="qa">
+    <details open><summary>資料には何が書いてありますか？<span class="tg" aria-hidden="true"></span></summary><p>サービスの中身、料金、対象の動画、ご利用の流れ、よくある質問を、16ページにまとめています。資料をお送りしたあと、そのまま60分の無料相談も予約できます。</p></details>
+    <details><summary>月に何本まで頼めますか？<span class="tg" aria-hidden="true"></span></summary><p>基本プランは、月3〜4本が目安です。品質を保つため、同時に進める編集は2本までで、1本納品したら次の1本に取りかかります。もっと本数が必要な場合は、スタンダード（月6〜8本）とプレミアム（月10〜12本）のプランがあります。料金はサービス資料に載せています。</p></details>
+    <details><summary>まずは1本だけ試せますか？<span class="tg" aria-hidden="true"></span></summary><p>1本から試せるお試しプランがあります（1社につき1回まで）。料金はサービス資料に載せています。</p></details>
+    <details><summary>素材が25分より長くても頼めますか？<span class="tg" aria-hidden="true"></span></summary><p>60分までは、追加料金で承ります。素材の長さに関わらず、初稿までは同じ5営業日です。</p></details>
+    <details><summary>撮影もお願いできますか？<span class="tg" aria-hidden="true"></span></summary><p>オプションで、1日5万円（税別・交通費別）でお受けします。固定カメラで撮れば、貴社で撮影していただいても十分です。</p></details>
+    <details><summary>どんな動画が対象ですか？<span class="tg" aria-hidden="true"></span></summary><p>固定カメラで撮影した対談動画と一人語り動画です。カメラを動かしながら撮った映像とサムネイルは対象外です。</p></details>
+    <details><summary>ショート動画も作れますか？<span class="tg" aria-hidden="true"></span></summary><p>長尺（YouTube向け）の編集とは別のご依頼で承ります。Instagramのリールなどで使う、1本2分以内の縦型動画を作ります。ショートだけのご依頼もできます。料金は1本7,000円（税別）で、10本・20本・30本をまとめて頼むと1本あたりが下がるパックもあります。詳しくはサービス資料に載せています。</p></details>
+    <details><summary>素材はどうやって送ればいいですか？<span class="tg" aria-hidden="true"></span></summary><p>ギガファイル便か、Google Driveでお送りください。撮影したデータを、そのままお送りいただければ大丈夫です。</p></details>
+    <details><summary>企画や台本もお願いできますか？<span class="tg" aria-hidden="true"></span></summary><p>オプションで、1本2万円（税別）でお受けします。</p></details>
+    <details><summary>契約期間と支払いは？<span class="tg" aria-hidden="true"></span></summary><p>3ヶ月ごとの更新で、3ヶ月分（基本プランは30万円・税別）を前払いでお願いしています。更新しない場合は、その3ヶ月の終わりで契約が終わります。</p></details>
+    <details><summary><span class="nb">途中で解約できますか？</span><span class="nb">返金はありますか？</span><span class="tg" aria-hidden="true"></span></summary><p>途中で解約された場合も、お支払いいただいた料金は払い戻しできません。返金するのは、当社の都合でサービスを提供できなくなった場合だけです。その場合は、残りの期間の分をお返しします。</p></details>
+    <details><summary>無料相談では何をしますか？<span class="tg" aria-hidden="true"></span></summary><p>今のお悩みを伺い、動画編集パスが貴社に合うか・合わないかを一緒に確かめます。撮り方・本数・使い道から、月額で頼むほうがよいか、1本ずつ外注するほうがよいかを金額で比べてお見せします。合わない場合は、そうお伝えします。合う場合は、最初の3ヶ月の進め方の案をお渡しします。</p></details>
+  </div>
+  <div class="cta-wrap"><div class="cta">
+      <p class="cta-bubble">＼ 会社名・お名前・メールアドレスだけ ／</p>
+      <a class="btn" href="request.html">サービス資料を無料でもらう</a>
+      <p class="cta-sub">資料のあと、そのまま60分の無料相談も予約できます</p>
+    </div></div>
+</section>
+
+<!-- 12 最後に -->
+<section class="last">
+  <img src="img/sdcard.jpg" width="1536" height="1024" alt="撮影したSDカードをパソコンに読み込んでいる手元" aria-hidden="true">
+  <div class="veil pad">
+    <h2 class="ttl"><span class="nb">「作りたい動画があるのに、</span><br><span class="nb">高くて作れない」を、</span><span class="l"><span class="mk">終わらせる。</span></span></h2>
+    <p><span class="nb">撮影した素材を送れば、</span><span class="nb">編集はすべて弊社で。</span><br><span class="nb">月額10万円〜の定額で、</span><span class="nb">動画を出し続けられます。</span></p>
+    <p class="for"><span class="nb">採用のために。</span><span class="nb">お客様のために。</span><span class="nb">これからの会社のために。</span></p>
+    <p><span class="nb">まずはサービス資料で、</span><span class="nb">中身と料金をご確認ください。</span><br><span class="nb">そのまま60分の無料相談も</span><span class="nb">予約できます。</span></p>
+    <div class="cta">
+      <p class="cta-bubble">＼ 会社名・お名前・メールアドレスだけ ／</p>
+      <a class="btn" href="request.html">サービス資料を無料でもらう</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="ftr pad">
+  <div><b>SAIBE DIGITAL</b><br>株式会社SAIBE DIGITAL</div>
+  <nav><a href="https://saibedigital.co.jp/" target="_blank" rel="noopener">会社サイト</a><a href="https://saibedigital.co.jp/privacy/" target="_blank" rel="noopener">プライバシーポリシー</a><a href="https://saibedigital.co.jp/contact/" target="_blank" rel="noopener">お問い合わせ</a></nav>
+  <p>掲載している人物の写真はイメージです。</p>
+</footer>
+</div>
+
+<div class="dock"><div><a class="btn" href="request.html">サービス資料を無料でもらう</a></div></div>
